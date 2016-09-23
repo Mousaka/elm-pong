@@ -45,11 +45,12 @@ update msg model =
 
 keyDown : KeyCode -> Model -> Model
 keyDown keyCode model =
+  let maxSpeed = 4 in
   case fromCode keyCode of
     ArrowUp ->
-      if model.velocity > -20 then {model | velocity = model.velocity - 1} else model
+      if model.velocity > -maxSpeed then {model | velocity = model.velocity - 1} else model
     ArrowDown ->
-      if model.velocity < 20 then {model | velocity = model.velocity + 1} else model
+      if model.velocity < maxSpeed then {model | velocity = model.velocity + 1} else model
     Space -> model
     Unknown -> model
 
@@ -62,8 +63,11 @@ view model =
   div [] [Svg.svg [Svg.Attributes.viewBox "0 0 1400 1000", Svg.Attributes.width "700px", Svg.Attributes.height "500px"]
       [ background
       , getRect model.y]
-      ,Html.text (toString model.y)]
+      , debugData model]
 
+debugData model=
+  div [] [ Html.text ("velocity: "++(toString model.velocity))
+  , Html.text ("y: "++(toString model.y))]
 
 background =
   rect [x "0", y "0", Svg.Attributes.width "1400", Svg.Attributes.height "1000", fill "black"] []
