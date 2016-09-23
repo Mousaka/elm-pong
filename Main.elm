@@ -6,6 +6,8 @@ import Keyboard exposing (..)
 import Key exposing (..)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
+import AnimationFrame
+import Time exposing (Time)
 
 main : Program Never
 main =
@@ -19,32 +21,41 @@ main =
 -- MODEl
 
 type alias Model =
-  {y: Int}
+  { y: Float
+  , velocity: Float
+  }
 
 init : (Model, Cmd Msg)
 init =
-  ({y = 500}, Cmd.none)
+  ({y = 500, velocity = 0}, Cmd.none)
 
 
 -- UPDATE
-type Msg = KeyDown KeyCode
+type Msg = TimeUpdate Time | KeyDown KeyCode | KeyUp KeyCode
 
 update: Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     KeyDown code ->
       (keyDown code model, Cmd.none)
+    KeyUp _ ->
+      ({model | velocity = 0}, Cmd.none)
+    TimeUpdate t ->
+      (applyPhysics t model, Cmd.none)
 
 keyDown : KeyCode -> Model -> Model
 keyDown keyCode model =
   case fromCode keyCode of
     ArrowUp ->
-      if model.y > 0 then {model | y = model.y - 10} else model
+      if model.velocity > -20 then {model | velocity = model.velocity - 1} else model
     ArrowDown ->
-      if model.y < 900 then {model | y = model.y + 10} else model
+      if model.velocity < 20 then {model | velocity = model.velocity + 1} else model
     Space -> model
     Unknown -> model
 
+applyPhysics : Time -> Model -> Model
+applyPhysics dt model =
+    { model | y = model.y + (model.velocity * dt) }
 -- VIEW
 
 view model =
@@ -61,7 +72,9 @@ background =
 subscriptions: Model -> Sub Msg
 subscriptions model =
   Sub.batch
-    [Keyboard.downs KeyDown]
+    [ AnimationFrame.diffs TimeUpdate
+    , Keyboard.downs KeyDown
+    , Keyboard.ups KeyUp]
 
 -- FUNCTIONS
 
