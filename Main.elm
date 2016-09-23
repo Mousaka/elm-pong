@@ -59,14 +59,14 @@ applyPhysics dt model =
 -- VIEW
 
 view model =
-  div [] [Svg.svg [Svg.Attributes.viewBox "0 0 1000 1000", Svg.Attributes.width "500px", Svg.Attributes.height "500px"]
+  div [] [Svg.svg [Svg.Attributes.viewBox "0 0 1400 1000", Svg.Attributes.width "700px", Svg.Attributes.height "500px"]
       [ background
       , getRect model.y]
       ,Html.text (toString model.y)]
 
 
 background =
-  rect [x "0", y "0", Svg.Attributes.width "1000", Svg.Attributes.height "1000", fill "black"] []
+  rect [x "0", y "0", Svg.Attributes.width "1400", Svg.Attributes.height "1000", fill "black"] []
 -- SUBSCRIPTIONS
 
 subscriptions: Model -> Sub Msg
