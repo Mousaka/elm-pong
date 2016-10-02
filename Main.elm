@@ -32,6 +32,7 @@ type alias Model =
 
 type alias Player =
     { y : Float
+    , x : Float
     , velocity : Float
     , direction : Direction
     }
@@ -58,12 +59,12 @@ init =
 
 initPlayer : Player
 initPlayer =
-    { y = 500, velocity = 0, direction = None }
+    { x = 30, y = 500, velocity = 0, direction = None }
 
 
 initBall : Ball
 initBall =
-    { x = 350, y = 500, speed = 1, direction = -1 * pi / 4 }
+    { x = 350, y = 500, speed = 1, direction = pi / 4 }
 
 
 
@@ -78,15 +79,20 @@ type Msg
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
+    ( updateHelper msg model, Cmd.none )
+
+
+updateHelper : Msg -> Model -> Model
+updateHelper msg model =
     case msg of
         KeyDown code ->
-            ( { model | player = keyDown code model.player }, Cmd.none )
+            { model | player = keyDown code model.player }
 
         KeyUp _ ->
-            ( { model | player = keyUp model.player }, Cmd.none )
+            { model | player = keyUp model.player }
 
-        TimeUpdate t ->
-            ( { model | player = applyPlayerPhysics t model.player, ball = applyBallPhysics t model.ball }, Cmd.none )
+        TimeUpdate dt ->
+            { model | player = applyPlayerPhysics dt model.player, ball = updateBall dt model.ball model.player }
 
 
 keyUp : Player -> Player
@@ -119,6 +125,52 @@ ballMove dt speed direction =
             dt * speed * sin direction
     in
         ( x, y )
+
+
+updateBall : Time -> Ball -> Player -> Ball
+updateBall dt ball player =
+    ball |> bounce player |> applyBallPhysics dt
+
+
+bounce : Player -> Ball -> Ball
+bounce player ball =
+    let
+        roof =
+            0
+
+        floor =
+            1000
+
+        px =
+            player.y
+
+        py =
+            player.y
+    in
+        if hitRoof ball || hitFloor ball || hitPlayer player ball || hitWall ball then
+            { ball | direction = ball.direction + pi / 2 }
+        else
+            ball
+
+
+hitWall : Ball -> Bool
+hitWall ball =
+    ball.x > 1400
+
+
+hitRoof : Ball -> Bool
+hitRoof ball =
+    ball.y <= 0
+
+
+hitFloor : Ball -> Bool
+hitFloor ball =
+    ball.y >= 1000
+
+
+hitPlayer : Player -> Ball -> Bool
+hitPlayer player ball =
+    (ball.y > player.y) && ball.y < (player.y + 100) && (ball.x < player.x)
 
 
 applyBallPhysics : Time -> Ball -> Ball
