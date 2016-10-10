@@ -25,7 +25,8 @@ main =
 
 
 type alias Model =
-    { player : Player
+    { player1 : Player
+    , player2 : Player
     , ball : Ball
     }
 
@@ -35,6 +36,7 @@ type alias Player =
     , x : Float
     , velocity : Float
     , direction : Direction
+    , side : Side
     }
 
 
@@ -52,19 +54,24 @@ type Direction
     | Down
 
 
+type Side
+    = Left
+    | Right
+
+
 init : ( Model, Cmd Msg )
 init =
-    ( { player = initPlayer, ball = initBall }, Cmd.none )
+    ( { player1 = initPlayer 30 Left, player2 = initPlayer 1350 Right, ball = initBall }, Cmd.none )
 
 
-initPlayer : Player
-initPlayer =
-    { x = 30, y = 500, velocity = 0, direction = None }
+initPlayer : Float -> Side -> Player
+initPlayer startX startSide =
+    { x = startX, y = 500, velocity = 0, direction = None, side = startSide }
 
 
 initBall : Ball
 initBall =
-    { x = 350, y = 500, speed = 1, direction = pi / 4 }
+    { x = 350, y = 400, speed = 1, direction = pi / 4 }
 
 
 
@@ -77,6 +84,12 @@ type Msg
     | KeyUp KeyCode
 
 
+type PlayerKey
+    = One
+    | Two
+    | Greger
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     ( updateHelper msg model, Cmd.none )
@@ -86,13 +99,51 @@ updateHelper : Msg -> Model -> Model
 updateHelper msg model =
     case msg of
         KeyDown code ->
-            { model | player = keyDown code model.player }
+            case oneOrTwo (fromCode code) of
+                One ->
+                    { model | player1 = keyDown code model.player1 }
 
-        KeyUp _ ->
-            { model | player = keyUp model.player }
+                Two ->
+                    { model | player2 = keyDown code model.player2 }
+
+                Greger ->
+                    model
+
+        KeyUp code ->
+            case oneOrTwo (fromCode code) of
+                One ->
+                    { model | player1 = keyUp model.player1 }
+
+                Two ->
+                    { model | player2 = keyUp model.player2 }
+
+                Greger ->
+                    model
 
         TimeUpdate dt ->
-            { model | player = applyPlayerPhysics dt model.player, ball = updateBall dt model.ball model.player }
+            { model | player1 = applyPlayerPhysics dt model.player1, player2 = applyPlayerPhysics dt model.player2, ball = updateBall dt model.ball model.player1 model.player2 }
+
+
+oneOrTwo : Key -> PlayerKey
+oneOrTwo code =
+    case code of
+        ArrowUp ->
+            Two
+
+        ArrowDown ->
+            Two
+
+        W ->
+            One
+
+        S ->
+            One
+
+        Space ->
+            Greger
+
+        Unknown ->
+            Greger
 
 
 keyUp : Player -> Player
@@ -108,6 +159,12 @@ keyDown keyCode player =
 
         ArrowUp ->
             { player | direction = Up }
+
+        W ->
+            { player | direction = Up }
+
+        S ->
+            { player | direction = Down }
 
         Space ->
             player
@@ -127,30 +184,44 @@ ballMove dt speed direction =
         ( x, y )
 
 
-updateBall : Time -> Ball -> Player -> Ball
-updateBall dt ball player =
-    ball |> bounce player |> applyBallPhysics dt
+updateBall : Time -> Ball -> Player -> Player -> Ball
+updateBall dt ball player1 player2 =
+    ball |> bouncePlayer player1 |> bouncePlayer player2 |> bounceEnvironment |> applyBallPhysics dt
 
 
-bounce : Player -> Ball -> Ball
-bounce player ball =
+bouncePlayer : Player -> Ball -> Ball
+bouncePlayer player ball =
     let
-        roof =
-            0
-
-        floor =
-            1000
-
         px =
             player.y
 
         py =
             player.y
     in
-        if hitRoof ball || hitFloor ball || hitPlayer player ball || hitWall ball then
-            { ball | direction = ball.direction + pi / 2 }
+        if hitPlayer player ball then
+            bounce ball
         else
             ball
+
+
+bounceEnvironment : Ball -> Ball
+bounceEnvironment ball =
+    let
+        roof =
+            0
+
+        floor =
+            1000
+    in
+        if hitRoof ball || hitFloor ball then
+            bounce ball
+        else
+            ball
+
+
+bounce : Ball -> Ball
+bounce ball =
+    { ball | direction = ball.direction + pi / 2 }
 
 
 hitWall : Ball -> Bool
@@ -170,7 +241,12 @@ hitFloor ball =
 
 hitPlayer : Player -> Ball -> Bool
 hitPlayer player ball =
-    (ball.y > player.y) && ball.y < (player.y + 100) && (ball.x < player.x)
+    case player.side of
+        Left ->
+            (ball.y > player.y) && ball.y < (player.y + 100) && (ball.x < player.x)
+
+        Right ->
+            (ball.y > player.y) && ball.y < (player.y + 100) && (ball.x > player.x)
 
 
 applyBallPhysics : Time -> Ball -> Ball
@@ -220,19 +296,26 @@ applyPlayerPhysics dt player =
 view : Model -> Html Msg
 view model =
     let
-        player =
-            model.player
+        player1 =
+            model.player1
+
+        player2 =
+            model.player2
 
         ball =
             model.ball
     in
         div []
             [ Svg.svg [ Svg.Attributes.viewBox "0 0 1400 1000", Svg.Attributes.width "700px", Svg.Attributes.height "500px" ]
-                [ background
-                , getRect player.y
-                , getBall ball.x ball.y
-                ]
-            , debugData player
+                ([ background
+                 , getRect player1.x player1.y
+                 , getRect player2.x player2.y
+                 , getBall ball.x ball.y
+                 ]
+                    ++ drawNet
+                )
+            , debugData player1
+            , debugData player2
             ]
 
 
@@ -247,6 +330,26 @@ debugData player =
 background : Svg Msg
 background =
     rect [ x "0", y "0", Svg.Attributes.width "1400", Svg.Attributes.height "1000", fill "black" ] []
+
+
+drawNet : List (Svg Msg)
+drawNet =
+    drawNetHelp 1000 []
+
+
+drawNetHelp : Int -> List (Svg Msg) -> List (Svg Msg)
+drawNetHelp yPos list =
+    case yPos > 0 of
+        True ->
+            drawNetHelp (yPos - 50) (list ++ [ dotNet yPos ])
+
+        False ->
+            list
+
+
+dotNet : Int -> Svg Msg
+dotNet yPos =
+    rect [ x "692", y (toString yPos), Svg.Attributes.width "16", Svg.Attributes.height "16", fill "white" ] []
 
 
 
@@ -266,13 +369,16 @@ subscriptions model =
 -- FUNCTIONS
 
 
-getRect : Float -> Svg Msg
-getRect yPos =
+getRect : Float -> Float -> Svg Msg
+getRect xPos yPos =
     let
+        xPos' =
+            toString xPos
+
         yPos' =
             toString yPos
     in
-        rect [ x "20", y yPos', Svg.Attributes.width "15", Svg.Attributes.height "100", fill "white" ] []
+        rect [ x xPos', y yPos', Svg.Attributes.width "15", Svg.Attributes.height "100", fill "white" ] []
 
 
 getBall : Float -> Float -> Svg Msg

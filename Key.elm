@@ -1,4 +1,3 @@
-
 module Key exposing (..)
 
 
@@ -6,6 +5,8 @@ type Key
     = Space
     | ArrowUp
     | ArrowDown
+    | W
+    | S
     | Unknown
 
 
@@ -21,5 +22,11 @@ fromCode keyCode =
         40 ->
             ArrowDown
 
+        87 ->
+            W
+
+        83 ->
+            S
+
         _ ->
-          Unknown
+            Unknown
