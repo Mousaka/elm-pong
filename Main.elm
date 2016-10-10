@@ -1,4 +1,4 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 import Html.App exposing (program)
 import Html exposing (..)
@@ -8,6 +8,12 @@ import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import AnimationFrame
 import Time exposing (Time)
+
+
+-- ports
+
+
+port alarm : () -> Cmd msg
 
 
 main : Program Never
@@ -61,7 +67,7 @@ type Side
 
 init : ( Model, Cmd Msg )
 init =
-    ( { player1 = initPlayer 30 Left, player2 = initPlayer 1350 Right, ball = initBall }, Cmd.none )
+    ( { player1 = initPlayer 30 Left, player2 = initPlayer 1350 Right, ball = initBall }, alarm () )
 
 
 initPlayer : Float -> Side -> Player
