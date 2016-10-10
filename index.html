@@ -1,0 +1,24 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Countdown clock</title>
+  <audio id="alarm">
+    <source src="audio/begin.mp3" type="audio/mpeg">
+  </audio>
+  <script type="text/javascript" src="pong.js"></script>
+</head>
+
+<body>
+  <div id="elm-app-lives-here"></div>
+<script type="text/javascript">
+  var elmDiv = document.getElementById('elm-app-lives-here');
+  var app = Elm.Main.embed(elmDiv);
+  app.ports.alarm.subscribe(function() {
+    document.getElementById('alarm').play();
+ });
+</script>
+
+</body>
+</html>
