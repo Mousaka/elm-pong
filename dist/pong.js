@@ -8794,7 +8794,37 @@ var _user$project$Key$fromCode = function (keyCode) {
 	}
 };
 
-var _user$project$Main$getBall = F2(
+var _user$project$Pong_Types$Model = F3(
+	function (a, b, c) {
+		return {player1: a, player2: b, ball: c};
+	});
+var _user$project$Pong_Types$Player = F5(
+	function (a, b, c, d, e) {
+		return {y: a, x: b, velocity: c, direction: d, side: e};
+	});
+var _user$project$Pong_Types$Ball = F4(
+	function (a, b, c, d) {
+		return {x: a, y: b, speed: c, direction: d};
+	});
+var _user$project$Pong_Types$Down = {ctor: 'Down'};
+var _user$project$Pong_Types$Up = {ctor: 'Up'};
+var _user$project$Pong_Types$None = {ctor: 'None'};
+var _user$project$Pong_Types$Right = {ctor: 'Right'};
+var _user$project$Pong_Types$Left = {ctor: 'Left'};
+var _user$project$Pong_Types$KeyUp = function (a) {
+	return {ctor: 'KeyUp', _0: a};
+};
+var _user$project$Pong_Types$KeyDown = function (a) {
+	return {ctor: 'KeyDown', _0: a};
+};
+var _user$project$Pong_Types$TimeUpdate = function (a) {
+	return {ctor: 'TimeUpdate', _0: a};
+};
+var _user$project$Pong_Types$Greger = {ctor: 'Greger'};
+var _user$project$Pong_Types$Two = {ctor: 'Two'};
+var _user$project$Pong_Types$One = {ctor: 'One'};
+
+var _user$project$Pong_View$getBall = F2(
 	function (xPos, yPos) {
 		return A2(
 			_elm_lang$svg$Svg$circle,
@@ -8810,7 +8840,7 @@ var _user$project$Main$getBall = F2(
 			_elm_lang$core$Native_List.fromArray(
 				[]));
 	});
-var _user$project$Main$getRect = F2(
+var _user$project$Pong_View$getRect = F2(
 	function (xPos, yPos) {
 		var yPos$ = _elm_lang$core$Basics$toString(yPos);
 		var xPos$ = _elm_lang$core$Basics$toString(xPos);
@@ -8827,7 +8857,7 @@ var _user$project$Main$getRect = F2(
 			_elm_lang$core$Native_List.fromArray(
 				[]));
 	});
-var _user$project$Main$dotNet = function (yPos) {
+var _user$project$Pong_View$dotNet = function (yPos) {
 	return A2(
 		_elm_lang$svg$Svg$rect,
 		_elm_lang$core$Native_List.fromArray(
@@ -8842,7 +8872,7 @@ var _user$project$Main$dotNet = function (yPos) {
 		_elm_lang$core$Native_List.fromArray(
 			[]));
 };
-var _user$project$Main$drawNetHelp = F2(
+var _user$project$Pong_View$drawNetHelp = F2(
 	function (yPos, list) {
 		drawNetHelp:
 		while (true) {
@@ -8854,7 +8884,7 @@ var _user$project$Main$drawNetHelp = F2(
 					list,
 					_elm_lang$core$Native_List.fromArray(
 						[
-							_user$project$Main$dotNet(yPos)
+							_user$project$Pong_View$dotNet(yPos)
 						]));
 				yPos = _v1;
 				list = _v2;
@@ -8864,12 +8894,12 @@ var _user$project$Main$drawNetHelp = F2(
 			}
 		}
 	});
-var _user$project$Main$drawNet = A2(
-	_user$project$Main$drawNetHelp,
+var _user$project$Pong_View$drawNet = A2(
+	_user$project$Pong_View$drawNetHelp,
 	1000,
 	_elm_lang$core$Native_List.fromArray(
 		[]));
-var _user$project$Main$background = A2(
+var _user$project$Pong_View$background = A2(
 	_elm_lang$svg$Svg$rect,
 	_elm_lang$core$Native_List.fromArray(
 		[
@@ -8881,7 +8911,7 @@ var _user$project$Main$background = A2(
 		]),
 	_elm_lang$core$Native_List.fromArray(
 		[]));
-var _user$project$Main$debugData = function (player) {
+var _user$project$Pong_View$debugData = function (player) {
 	return A2(
 		_elm_lang$html$Html$div,
 		_elm_lang$core$Native_List.fromArray(
@@ -8900,7 +8930,7 @@ var _user$project$Main$debugData = function (player) {
 					_elm_lang$core$Basics$toString(player.y)))
 			]));
 };
-var _user$project$Main$view = function (model) {
+var _user$project$Pong_View$view = function (model) {
 	var ball = model.ball;
 	var player2 = model.player2;
 	var player1 = model.player1;
@@ -8922,20 +8952,30 @@ var _user$project$Main$view = function (model) {
 					_elm_lang$core$Basics_ops['++'],
 					_elm_lang$core$Native_List.fromArray(
 						[
-							_user$project$Main$background,
-							A2(_user$project$Main$getRect, player1.x, player1.y),
-							A2(_user$project$Main$getRect, player2.x, player2.y),
-							A2(_user$project$Main$getBall, ball.x, ball.y)
+							_user$project$Pong_View$background,
+							A2(_user$project$Pong_View$getRect, player1.x, player1.y),
+							A2(_user$project$Pong_View$getRect, player2.x, player2.y),
+							A2(_user$project$Pong_View$getBall, ball.x, ball.y)
 						]),
-					_user$project$Main$drawNet)),
-				_user$project$Main$debugData(player1),
-				_user$project$Main$debugData(player2)
+					_user$project$Pong_View$drawNet)),
+				_user$project$Pong_View$debugData(player1),
+				_user$project$Pong_View$debugData(player2)
 			]));
 };
-var _user$project$Main$applyPlayerPhysics = F2(
+
+var _user$project$Pong_State$subscriptions = function (model) {
+	return _elm_lang$core$Platform_Sub$batch(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$animation_frame$AnimationFrame$diffs(_user$project$Pong_Types$TimeUpdate),
+				_elm_lang$keyboard$Keyboard$downs(_user$project$Pong_Types$KeyDown),
+				_elm_lang$keyboard$Keyboard$ups(_user$project$Pong_Types$KeyUp)
+			]));
+};
+var _user$project$Pong_State$applyPlayerPhysics = F2(
 	function (dt, player) {
-		var _p1 = player.direction;
-		switch (_p1.ctor) {
+		var _p0 = player.direction;
+		switch (_p0.ctor) {
 			case 'Up':
 				return _elm_lang$core$Native_Utils.update(
 					player,
@@ -8952,239 +8992,202 @@ var _user$project$Main$applyPlayerPhysics = F2(
 				return player;
 		}
 	});
-var _user$project$Main$hitPlayer = F2(
+var _user$project$Pong_State$hitPlayer = F2(
 	function (player, ball) {
-		var _p2 = player.side;
-		if (_p2.ctor === 'Left') {
+		var _p1 = player.side;
+		if (_p1.ctor === 'Left') {
 			return (_elm_lang$core$Native_Utils.cmp(ball.y, player.y) > 0) && ((_elm_lang$core$Native_Utils.cmp(ball.y, player.y + 100) < 0) && (_elm_lang$core$Native_Utils.cmp(ball.x, player.x) < 0));
 		} else {
 			return (_elm_lang$core$Native_Utils.cmp(ball.y, player.y) > 0) && ((_elm_lang$core$Native_Utils.cmp(ball.y, player.y + 100) < 0) && (_elm_lang$core$Native_Utils.cmp(ball.x, player.x) > 0));
 		}
 	});
-var _user$project$Main$hitFloor = function (ball) {
+var _user$project$Pong_State$hitFloor = function (ball) {
 	return _elm_lang$core$Native_Utils.cmp(ball.y, 1000) > -1;
 };
-var _user$project$Main$hitRoof = function (ball) {
+var _user$project$Pong_State$hitRoof = function (ball) {
 	return _elm_lang$core$Native_Utils.cmp(ball.y, 0) < 1;
 };
-var _user$project$Main$hitWall = function (ball) {
+var _user$project$Pong_State$hitWall = function (ball) {
 	return _elm_lang$core$Native_Utils.cmp(ball.x, 1400) > 0;
 };
-var _user$project$Main$bounce = function (ball) {
+var _user$project$Pong_State$bounce = function (ball) {
 	return _elm_lang$core$Native_Utils.update(
 		ball,
 		{direction: ball.direction + (_elm_lang$core$Basics$pi / 2)});
 };
-var _user$project$Main$bounceEnvironment = function (ball) {
+var _user$project$Pong_State$bounceEnvironment = function (ball) {
 	var floor = 1000;
 	var roof = 0;
-	return (_user$project$Main$hitRoof(ball) || _user$project$Main$hitFloor(ball)) ? _user$project$Main$bounce(ball) : ball;
+	return (_user$project$Pong_State$hitRoof(ball) || _user$project$Pong_State$hitFloor(ball)) ? _user$project$Pong_State$bounce(ball) : ball;
 };
-var _user$project$Main$bouncePlayer = F2(
+var _user$project$Pong_State$bouncePlayer = F2(
 	function (player, ball) {
 		var py = player.y;
 		var px = player.y;
-		return A2(_user$project$Main$hitPlayer, player, ball) ? _user$project$Main$bounce(ball) : ball;
+		return A2(_user$project$Pong_State$hitPlayer, player, ball) ? _user$project$Pong_State$bounce(ball) : ball;
 	});
-var _user$project$Main$ballMove = F3(
+var _user$project$Pong_State$ballMove = F3(
 	function (dt, speed, direction) {
 		var y = (dt * speed) * _elm_lang$core$Basics$sin(direction);
 		var x = (dt * speed) * _elm_lang$core$Basics$cos(direction);
 		return {ctor: '_Tuple2', _0: x, _1: y};
 	});
-var _user$project$Main$applyBallPhysics = F2(
+var _user$project$Pong_State$applyBallPhysics = F2(
 	function (dt, ball) {
-		var _p3 = A3(_user$project$Main$ballMove, dt, ball.speed, ball.direction);
-		var x = _p3._0;
-		var y = _p3._1;
+		var _p2 = A3(_user$project$Pong_State$ballMove, dt, ball.speed, ball.direction);
+		var x = _p2._0;
+		var y = _p2._1;
 		var newX = ball.x + x;
 		var newY = ball.y + y;
 		return _elm_lang$core$Native_Utils.update(
 			ball,
 			{x: newX, y: newY});
 	});
-var _user$project$Main$updateBall = F4(
+var _user$project$Pong_State$updateBall = F4(
 	function (dt, ball, player1, player2) {
 		return A2(
-			_user$project$Main$applyBallPhysics,
+			_user$project$Pong_State$applyBallPhysics,
 			dt,
-			_user$project$Main$bounceEnvironment(
+			_user$project$Pong_State$bounceEnvironment(
 				A2(
-					_user$project$Main$bouncePlayer,
+					_user$project$Pong_State$bouncePlayer,
 					player2,
-					A2(_user$project$Main$bouncePlayer, player1, ball))));
+					A2(_user$project$Pong_State$bouncePlayer, player1, ball))));
 	});
-var _user$project$Main$initBall = {x: 350, y: 400, speed: 1, direction: _elm_lang$core$Basics$pi / 4};
-var _user$project$Main$alarm = _elm_lang$core$Native_Platform.outgoingPort(
-	'alarm',
-	function (v) {
-		return null;
-	});
-var _user$project$Main$Model = F3(
-	function (a, b, c) {
-		return {player1: a, player2: b, ball: c};
-	});
-var _user$project$Main$Player = F5(
-	function (a, b, c, d, e) {
-		return {y: a, x: b, velocity: c, direction: d, side: e};
-	});
-var _user$project$Main$Ball = F4(
-	function (a, b, c, d) {
-		return {x: a, y: b, speed: c, direction: d};
-	});
-var _user$project$Main$Down = {ctor: 'Down'};
-var _user$project$Main$Up = {ctor: 'Up'};
-var _user$project$Main$keyDown = F2(
+var _user$project$Pong_State$keyDown = F2(
 	function (keyCode, player) {
-		var _p4 = _user$project$Key$fromCode(keyCode);
-		switch (_p4.ctor) {
+		var _p3 = _user$project$Key$fromCode(keyCode);
+		switch (_p3.ctor) {
 			case 'ArrowDown':
 				return _elm_lang$core$Native_Utils.update(
 					player,
-					{direction: _user$project$Main$Down});
+					{direction: _user$project$Pong_Types$Down});
 			case 'ArrowUp':
 				return _elm_lang$core$Native_Utils.update(
 					player,
-					{direction: _user$project$Main$Up});
+					{direction: _user$project$Pong_Types$Up});
 			case 'W':
 				return _elm_lang$core$Native_Utils.update(
 					player,
-					{direction: _user$project$Main$Up});
+					{direction: _user$project$Pong_Types$Up});
 			case 'S':
 				return _elm_lang$core$Native_Utils.update(
 					player,
-					{direction: _user$project$Main$Down});
+					{direction: _user$project$Pong_Types$Down});
 			case 'Space':
 				return player;
 			default:
 				return player;
 		}
 	});
-var _user$project$Main$None = {ctor: 'None'};
-var _user$project$Main$initPlayer = F2(
-	function (startX, startSide) {
-		return {x: startX, y: 500, velocity: 0, direction: _user$project$Main$None, side: startSide};
-	});
-var _user$project$Main$keyUp = function (player) {
+var _user$project$Pong_State$keyUp = function (player) {
 	return _elm_lang$core$Native_Utils.update(
 		player,
-		{direction: _user$project$Main$None});
+		{direction: _user$project$Pong_Types$None});
 };
-var _user$project$Main$Right = {ctor: 'Right'};
-var _user$project$Main$Left = {ctor: 'Left'};
-var _user$project$Main$init = {
-	ctor: '_Tuple2',
-	_0: {
-		player1: A2(_user$project$Main$initPlayer, 30, _user$project$Main$Left),
-		player2: A2(_user$project$Main$initPlayer, 1350, _user$project$Main$Right),
-		ball: _user$project$Main$initBall
-	},
-	_1: _user$project$Main$alarm(
-		{ctor: '_Tuple0'})
-};
-var _user$project$Main$KeyUp = function (a) {
-	return {ctor: 'KeyUp', _0: a};
-};
-var _user$project$Main$KeyDown = function (a) {
-	return {ctor: 'KeyDown', _0: a};
-};
-var _user$project$Main$TimeUpdate = function (a) {
-	return {ctor: 'TimeUpdate', _0: a};
-};
-var _user$project$Main$subscriptions = function (model) {
-	return _elm_lang$core$Platform_Sub$batch(
-		_elm_lang$core$Native_List.fromArray(
-			[
-				_elm_lang$animation_frame$AnimationFrame$diffs(_user$project$Main$TimeUpdate),
-				_elm_lang$keyboard$Keyboard$downs(_user$project$Main$KeyDown),
-				_elm_lang$keyboard$Keyboard$ups(_user$project$Main$KeyUp)
-			]));
-};
-var _user$project$Main$Greger = {ctor: 'Greger'};
-var _user$project$Main$Two = {ctor: 'Two'};
-var _user$project$Main$One = {ctor: 'One'};
-var _user$project$Main$oneOrTwo = function (code) {
-	var _p5 = code;
-	switch (_p5.ctor) {
+var _user$project$Pong_State$oneOrTwo = function (code) {
+	var _p4 = code;
+	switch (_p4.ctor) {
 		case 'ArrowUp':
-			return _user$project$Main$Two;
+			return _user$project$Pong_Types$Two;
 		case 'ArrowDown':
-			return _user$project$Main$Two;
+			return _user$project$Pong_Types$Two;
 		case 'W':
-			return _user$project$Main$One;
+			return _user$project$Pong_Types$One;
 		case 'S':
-			return _user$project$Main$One;
+			return _user$project$Pong_Types$One;
 		case 'Space':
-			return _user$project$Main$Greger;
+			return _user$project$Pong_Types$Greger;
 		default:
-			return _user$project$Main$Greger;
+			return _user$project$Pong_Types$Greger;
 	}
 };
-var _user$project$Main$updateHelper = F2(
+var _user$project$Pong_State$updateHelper = F2(
 	function (msg, model) {
-		var _p6 = msg;
-		switch (_p6.ctor) {
+		var _p5 = msg;
+		switch (_p5.ctor) {
 			case 'KeyDown':
-				var _p8 = _p6._0;
-				var _p7 = _user$project$Main$oneOrTwo(
-					_user$project$Key$fromCode(_p8));
-				switch (_p7.ctor) {
+				var _p7 = _p5._0;
+				var _p6 = _user$project$Pong_State$oneOrTwo(
+					_user$project$Key$fromCode(_p7));
+				switch (_p6.ctor) {
 					case 'One':
 						return _elm_lang$core$Native_Utils.update(
 							model,
 							{
-								player1: A2(_user$project$Main$keyDown, _p8, model.player1)
+								player1: A2(_user$project$Pong_State$keyDown, _p7, model.player1)
 							});
 					case 'Two':
 						return _elm_lang$core$Native_Utils.update(
 							model,
 							{
-								player2: A2(_user$project$Main$keyDown, _p8, model.player2)
+								player2: A2(_user$project$Pong_State$keyDown, _p7, model.player2)
 							});
 					default:
 						return model;
 				}
 			case 'KeyUp':
-				var _p9 = _user$project$Main$oneOrTwo(
-					_user$project$Key$fromCode(_p6._0));
-				switch (_p9.ctor) {
+				var _p8 = _user$project$Pong_State$oneOrTwo(
+					_user$project$Key$fromCode(_p5._0));
+				switch (_p8.ctor) {
 					case 'One':
 						return _elm_lang$core$Native_Utils.update(
 							model,
 							{
-								player1: _user$project$Main$keyUp(model.player1)
+								player1: _user$project$Pong_State$keyUp(model.player1)
 							});
 					case 'Two':
 						return _elm_lang$core$Native_Utils.update(
 							model,
 							{
-								player2: _user$project$Main$keyUp(model.player2)
+								player2: _user$project$Pong_State$keyUp(model.player2)
 							});
 					default:
 						return model;
 				}
 			default:
-				var _p10 = _p6._0;
+				var _p9 = _p5._0;
 				return _elm_lang$core$Native_Utils.update(
 					model,
 					{
-						player1: A2(_user$project$Main$applyPlayerPhysics, _p10, model.player1),
-						player2: A2(_user$project$Main$applyPlayerPhysics, _p10, model.player2),
-						ball: A4(_user$project$Main$updateBall, _p10, model.ball, model.player1, model.player2)
+						player1: A2(_user$project$Pong_State$applyPlayerPhysics, _p9, model.player1),
+						player2: A2(_user$project$Pong_State$applyPlayerPhysics, _p9, model.player2),
+						ball: A4(_user$project$Pong_State$updateBall, _p9, model.ball, model.player1, model.player2)
 					});
 		}
 	});
-var _user$project$Main$update = F2(
+var _user$project$Pong_State$update = F2(
 	function (msg, model) {
 		return {
 			ctor: '_Tuple2',
-			_0: A2(_user$project$Main$updateHelper, msg, model),
+			_0: A2(_user$project$Pong_State$updateHelper, msg, model),
 			_1: _elm_lang$core$Platform_Cmd$none
 		};
 	});
+var _user$project$Pong_State$initBall = {x: 350, y: 400, speed: 1, direction: _elm_lang$core$Basics$pi / 4};
+var _user$project$Pong_State$initPlayer = F2(
+	function (startX, startSide) {
+		return {x: startX, y: 500, velocity: 0, direction: _user$project$Pong_Types$None, side: startSide};
+	});
+var _user$project$Pong_State$alarm = _elm_lang$core$Native_Platform.outgoingPort(
+	'alarm',
+	function (v) {
+		return null;
+	});
+var _user$project$Pong_State$init = {
+	ctor: '_Tuple2',
+	_0: {
+		player1: A2(_user$project$Pong_State$initPlayer, 30, _user$project$Pong_Types$Left),
+		player2: A2(_user$project$Pong_State$initPlayer, 1350, _user$project$Pong_Types$Right),
+		ball: _user$project$Pong_State$initBall
+	},
+	_1: _user$project$Pong_State$alarm(
+		{ctor: '_Tuple0'})
+};
+
 var _user$project$Main$main = {
 	main: _elm_lang$html$Html_App$program(
-		{init: _user$project$Main$init, update: _user$project$Main$update, view: _user$project$Main$view, subscriptions: _user$project$Main$subscriptions})
+		{init: _user$project$Pong_State$init, update: _user$project$Pong_State$update, view: _user$project$Pong_View$view, subscriptions: _user$project$Pong_State$subscriptions})
 };
 
 var Elm = {};

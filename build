@@ -1,1 +1,1 @@
-elm make src/Main.elm --output=build/Pong.js
+elm make src/Main.elm --output=dist/pong.js
