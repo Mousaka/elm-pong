@@ -1,6 +1,6 @@
-port module State exposing (init, update, subscriptions)
+port module Pong.State exposing (init, update, subscriptions)
 
-import Types exposing (..)
+import Pong.Types exposing (..)
 import Key exposing (..)
 import Keyboard exposing (..)
 import Time exposing (..)

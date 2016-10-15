@@ -1,9 +1,9 @@
-module View exposing (..)
+module Pong.View exposing (..)
 
 import Html exposing (..)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
-import Types exposing (..)
+import Pong.Types exposing (..)
 
 
 -- VIEW

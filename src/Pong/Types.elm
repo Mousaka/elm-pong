@@ -1,4 +1,4 @@
-module Types exposing (..)
+module Pong.Types exposing (..)
 
 import Time exposing (Time)
 import Keyboard exposing (..)
