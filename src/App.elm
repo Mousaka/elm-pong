@@ -1,4 +1,4 @@
-port module Main exposing (..)
+module App exposing (..)
 
 import Html.App exposing (program)
 import Pong.View exposing (view)

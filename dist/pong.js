@@ -8770,30 +8770,6 @@ var _elm_lang$svg$Svg_Attributes$accumulate = _elm_lang$virtual_dom$VirtualDom$a
 var _elm_lang$svg$Svg_Attributes$accelerate = _elm_lang$virtual_dom$VirtualDom$attribute('accelerate');
 var _elm_lang$svg$Svg_Attributes$accentHeight = _elm_lang$virtual_dom$VirtualDom$attribute('accent-height');
 
-var _user$project$Key$Unknown = {ctor: 'Unknown'};
-var _user$project$Key$S = {ctor: 'S'};
-var _user$project$Key$W = {ctor: 'W'};
-var _user$project$Key$ArrowDown = {ctor: 'ArrowDown'};
-var _user$project$Key$ArrowUp = {ctor: 'ArrowUp'};
-var _user$project$Key$Space = {ctor: 'Space'};
-var _user$project$Key$fromCode = function (keyCode) {
-	var _p0 = keyCode;
-	switch (_p0) {
-		case 32:
-			return _user$project$Key$Space;
-		case 38:
-			return _user$project$Key$ArrowUp;
-		case 40:
-			return _user$project$Key$ArrowDown;
-		case 87:
-			return _user$project$Key$W;
-		case 83:
-			return _user$project$Key$S;
-		default:
-			return _user$project$Key$Unknown;
-	}
-};
-
 var _user$project$Pong_Types$Model = F3(
 	function (a, b, c) {
 		return {player1: a, player2: b, ball: c};
@@ -8963,6 +8939,30 @@ var _user$project$Pong_View$view = function (model) {
 			]));
 };
 
+var _user$project$Pong_Key$Unknown = {ctor: 'Unknown'};
+var _user$project$Pong_Key$S = {ctor: 'S'};
+var _user$project$Pong_Key$W = {ctor: 'W'};
+var _user$project$Pong_Key$ArrowDown = {ctor: 'ArrowDown'};
+var _user$project$Pong_Key$ArrowUp = {ctor: 'ArrowUp'};
+var _user$project$Pong_Key$Space = {ctor: 'Space'};
+var _user$project$Pong_Key$fromCode = function (keyCode) {
+	var _p0 = keyCode;
+	switch (_p0) {
+		case 32:
+			return _user$project$Pong_Key$Space;
+		case 38:
+			return _user$project$Pong_Key$ArrowUp;
+		case 40:
+			return _user$project$Pong_Key$ArrowDown;
+		case 87:
+			return _user$project$Pong_Key$W;
+		case 83:
+			return _user$project$Pong_Key$S;
+		default:
+			return _user$project$Pong_Key$Unknown;
+	}
+};
+
 var _user$project$Pong_State$subscriptions = function (model) {
 	return _elm_lang$core$Platform_Sub$batch(
 		_elm_lang$core$Native_List.fromArray(
@@ -8972,59 +8972,77 @@ var _user$project$Pong_State$subscriptions = function (model) {
 				_elm_lang$keyboard$Keyboard$ups(_user$project$Pong_Types$KeyUp)
 			]));
 };
-var _user$project$Pong_State$applyPlayerPhysics = F2(
-	function (dt, player) {
-		var _p0 = player.direction;
-		switch (_p0.ctor) {
-			case 'Up':
-				return _elm_lang$core$Native_Utils.update(
-					player,
-					{
-						y: (_elm_lang$core$Native_Utils.cmp(player.y, 0) < 1) ? player.y : (player.y - 7)
-					});
-			case 'Down':
-				return _elm_lang$core$Native_Utils.update(
-					player,
-					{
-						y: (_elm_lang$core$Native_Utils.cmp(player.y, 900) > -1) ? player.y : (player.y + 7)
-					});
-			default:
-				return player;
-		}
-	});
 var _user$project$Pong_State$hitPlayer = F2(
 	function (player, ball) {
-		var _p1 = player.side;
-		if (_p1.ctor === 'Left') {
+		var _p0 = player.side;
+		if (_p0.ctor === 'Left') {
 			return (_elm_lang$core$Native_Utils.cmp(ball.y, player.y) > 0) && ((_elm_lang$core$Native_Utils.cmp(ball.y, player.y + 100) < 0) && (_elm_lang$core$Native_Utils.cmp(ball.x, player.x) < 0));
 		} else {
 			return (_elm_lang$core$Native_Utils.cmp(ball.y, player.y) > 0) && ((_elm_lang$core$Native_Utils.cmp(ball.y, player.y + 100) < 0) && (_elm_lang$core$Native_Utils.cmp(ball.x, player.x) > 0));
 		}
 	});
-var _user$project$Pong_State$hitFloor = function (ball) {
-	return _elm_lang$core$Native_Utils.cmp(ball.y, 1000) > -1;
+var _user$project$Pong_State$abs = function (num) {
+	return (num * num) / num;
 };
+var _user$project$Pong_State$roofBounce = function (direction) {
+	return (_elm_lang$core$Basics$pi / 2) - direction;
+};
+var _user$project$Pong_State$bounce = F3(
+	function (ball, angle, correction) {
+		return _elm_lang$core$Native_Utils.update(
+			ball,
+			{direction: ball.direction + angle});
+	});
+var _user$project$Pong_State$wall = 1400;
+var _user$project$Pong_State$roof = 0;
 var _user$project$Pong_State$hitRoof = function (ball) {
-	return _elm_lang$core$Native_Utils.cmp(ball.y, 0) < 1;
+	if (_elm_lang$core$Native_Utils.cmp(ball.y, _user$project$Pong_State$roof) < 1) {
+		var bouncedAngle = _user$project$Pong_State$roofBounce(ball.direction);
+		var angle = ball.direction + (_elm_lang$core$Basics$pi / 4);
+		return A3(_user$project$Pong_State$bounce, ball, angle, _user$project$Pong_State$roof - ball.y);
+	} else {
+		return ball;
+	}
 };
-var _user$project$Pong_State$hitWall = function (ball) {
-	return _elm_lang$core$Native_Utils.cmp(ball.x, 1400) > 0;
-};
-var _user$project$Pong_State$bounce = function (ball) {
-	return _elm_lang$core$Native_Utils.update(
-		ball,
-		{direction: ball.direction + (_elm_lang$core$Basics$pi / 2)});
+var _user$project$Pong_State$floor = 1000;
+var _user$project$Pong_State$hitFloor = function (ball) {
+	if (_elm_lang$core$Native_Utils.cmp(ball.y, _user$project$Pong_State$floor) > -1) {
+		var angle = ball.direction + (_elm_lang$core$Basics$pi / 4);
+		return A3(_user$project$Pong_State$bounce, ball, angle, _user$project$Pong_State$floor - ball.y);
+	} else {
+		return ball;
+	}
 };
 var _user$project$Pong_State$bounceEnvironment = function (ball) {
-	var floor = 1000;
 	var roof = 0;
-	return (_user$project$Pong_State$hitRoof(ball) || _user$project$Pong_State$hitFloor(ball)) ? _user$project$Pong_State$bounce(ball) : ball;
+	return _user$project$Pong_State$hitFloor(
+		_user$project$Pong_State$hitRoof(ball));
 };
+var _user$project$Pong_State$applyPlayerPhysics = F2(
+	function (dt, player) {
+		var _p1 = player.direction;
+		switch (_p1.ctor) {
+			case 'Up':
+				return _elm_lang$core$Native_Utils.update(
+					player,
+					{
+						y: (_elm_lang$core$Native_Utils.cmp(player.y, _user$project$Pong_State$roof) < 1) ? player.y : (player.y - 7)
+					});
+			case 'Down':
+				return _elm_lang$core$Native_Utils.update(
+					player,
+					{
+						y: (_elm_lang$core$Native_Utils.cmp(player.y, _user$project$Pong_State$floor - 100) > -1) ? player.y : (player.y + 7)
+					});
+			default:
+				return player;
+		}
+	});
 var _user$project$Pong_State$bouncePlayer = F2(
 	function (player, ball) {
 		var py = player.y;
 		var px = player.y;
-		return A2(_user$project$Pong_State$hitPlayer, player, ball) ? _user$project$Pong_State$bounce(ball) : ball;
+		return A2(_user$project$Pong_State$hitPlayer, player, ball) ? A3(_user$project$Pong_State$bounce, ball, _elm_lang$core$Basics$pi / 4, 0) : ball;
 	});
 var _user$project$Pong_State$ballMove = F3(
 	function (dt, speed, direction) {
@@ -9056,7 +9074,7 @@ var _user$project$Pong_State$updateBall = F4(
 	});
 var _user$project$Pong_State$keyDown = F2(
 	function (keyCode, player) {
-		var _p3 = _user$project$Key$fromCode(keyCode);
+		var _p3 = _user$project$Pong_Key$fromCode(keyCode);
 		switch (_p3.ctor) {
 			case 'ArrowDown':
 				return _elm_lang$core$Native_Utils.update(
@@ -9109,7 +9127,7 @@ var _user$project$Pong_State$updateHelper = F2(
 			case 'KeyDown':
 				var _p7 = _p5._0;
 				var _p6 = _user$project$Pong_State$oneOrTwo(
-					_user$project$Key$fromCode(_p7));
+					_user$project$Pong_Key$fromCode(_p7));
 				switch (_p6.ctor) {
 					case 'One':
 						return _elm_lang$core$Native_Utils.update(
@@ -9128,7 +9146,7 @@ var _user$project$Pong_State$updateHelper = F2(
 				}
 			case 'KeyUp':
 				var _p8 = _user$project$Pong_State$oneOrTwo(
-					_user$project$Key$fromCode(_p5._0));
+					_user$project$Pong_Key$fromCode(_p5._0));
 				switch (_p8.ctor) {
 					case 'One':
 						return _elm_lang$core$Native_Utils.update(

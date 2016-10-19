@@ -1,4 +1,4 @@
-module Key exposing (..)
+module Pong.Key exposing (..)
 
 
 type Key
