@@ -1,4 +1,4 @@
-port module Pong.State exposing (init, update, floor, wall, roof, howFarPastX, roofBounce)
+port module Pong.State exposing (init, update, floor, wall, roof, howFarPastX, generalBounce)
 
 import Pong.Types exposing (..)
 import Pong.Key exposing (..)
@@ -19,7 +19,7 @@ initPlayer startX startSide =
 
 initBall : Ball
 initBall =
-    { x = 350, y = 400, speed = 1, direction = -(pi / 6) }
+    { x = 350, y = 400, speed = 1, direction = (pi / 4) }
 
 
 
@@ -123,22 +123,19 @@ ballMove dt speed direction =
 
 updateBall : Time -> Ball -> Player -> Player -> Ball
 updateBall dt ball player1 player2 =
-    ball |> bouncePlayer player1 |> bouncePlayer player2 |> bounceEnvironment |> applyBallPhysics dt
+    ball
+        |> bouncePlayer player1
+        |> bouncePlayer player2
+        |> bounceEnvironment
+        |> applyBallPhysics dt
 
 
 bouncePlayer : Player -> Ball -> Ball
 bouncePlayer player ball =
-    let
-        px =
-            player.y
-
-        py =
-            player.y
-    in
-        if hitPlayer player ball then
-            bounce ball (pi / 4) 0 0
-        else
-            ball
+    if hitPlayer player ball then
+        bounce ball (ball.direction + 2 * ball.direction) 0 0
+    else
+        ball
 
 
 floor : Float
@@ -158,11 +155,7 @@ wall =
 
 bounceEnvironment : Ball -> Ball
 bounceEnvironment ball =
-    let
-        roof =
-            0
-    in
-        ball |> hitRoof |> hitFloor
+    ball |> hitRoof |> hitFloor
 
 
 bounce : Ball -> Float -> Float -> Float -> Ball
@@ -178,7 +171,7 @@ bounce ball angle x y =
             Debug.log "angle is: " angle
     in
         { ball
-            | direction = ball.direction + angle
+            | direction = angle
             , x = ball.x - x
             , y = ball.y - y
         }
@@ -191,13 +184,28 @@ hitRoof ball =
             hfpX =
                 howFarPastX ball.direction (-1 * ball.y)
 
-            angle =
-                -(ball.direction * 2)
+            bouncedAngle =
+                generalBounce ball.direction
+        in
+            bounce ball bouncedAngle hfpX ball.y
+    else
+        ball
+
+
+hitFloor : Ball -> Ball
+hitFloor ball =
+    if ball.y > floor then
+        let
+            hfpY =
+                (ball.y - floor)
+
+            hfpX =
+                Debug.log "hfp:" (howFarPastX ball.direction hfpY)
 
             bouncedAngle =
-                roofBounce ball.direction
+                Debug.log "Bounce angle: " <| generalBounce ball.direction
         in
-            bounce ball angle hfpX ball.y
+            bounce ball bouncedAngle hfpX hfpY
     else
         ball
 
@@ -218,21 +226,9 @@ howFarPastX angle y =
         y * (sin oppositeAngle) / (sin angle')
 
 
-roofBounce : Float -> Float
-roofBounce direction =
-    (pi / 2) - direction
-
-
-hitFloor : Ball -> Ball
-hitFloor ball =
-    if ball.y >= floor then
-        let
-            angle =
-                ball.direction + (pi / 4)
-        in
-            bounce ball angle (floor - ball.y) 0.1
-    else
-        ball
+generalBounce : Float -> Float
+generalBounce direction =
+    -direction
 
 
 hitPlayer : Player -> Ball -> Bool
