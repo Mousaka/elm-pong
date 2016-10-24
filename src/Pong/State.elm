@@ -1,13 +1,10 @@
-port module Pong.State exposing (init, update, subscriptions, floor, wall, roof, howFarPastX)
+module Pong.State exposing (init, update, floor, wall, roof, howFarPastX, roofBounce)
 
 import Pong.Types exposing (..)
 import Pong.Key exposing (..)
+import Pong.Ports exposing (..)
 import Keyboard exposing (..)
 import Time exposing (..)
-import AnimationFrame
-
-
-port alarm : () -> Cmd msg
 
 
 init : ( Model, Cmd Msg )
@@ -22,7 +19,7 @@ initPlayer startX startSide =
 
 initBall : Ball
 initBall =
-    { x = 350, y = 400, speed = 1, direction = -pi / 4 }
+    { x = 350, y = 400, speed = 1, direction = -(pi / 6) }
 
 
 
@@ -195,7 +192,7 @@ hitRoof ball =
                 howFarPastX ball.direction (-1 * ball.y)
 
             angle =
-                ball.direction - (pi / 4)
+                -(ball.direction * 2)
 
             bouncedAngle =
                 roofBounce ball.direction
@@ -212,19 +209,18 @@ hitRoof ball =
 howFarPastX : Float -> Float -> Float
 howFarPastX angle y =
     let
+        angle' =
+            (abs angle)
+
         oppositeAngle =
-            (pi / 2) - angle
+            (pi / 2) - angle'
     in
-        y * (sin oppositeAngle) / (sin angle)
+        y * (sin oppositeAngle) / (sin angle')
 
 
 roofBounce : Float -> Float
 roofBounce direction =
     (pi / 2) - direction
-
-
-abs num =
-    (num * num) / num
 
 
 hitFloor : Ball -> Ball
@@ -287,16 +283,3 @@ applyPlayerPhysics dt player =
 
         None ->
             player
-
-
-
--- SUBSCRIPTIONS
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.batch
-        [ AnimationFrame.diffs TimeUpdate
-        , Keyboard.downs KeyDown
-        , Keyboard.ups KeyUp
-        ]
