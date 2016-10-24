@@ -8963,15 +8963,12 @@ var _user$project$Pong_Key$fromCode = function (keyCode) {
 	}
 };
 
-var _user$project$Pong_State$subscriptions = function (model) {
-	return _elm_lang$core$Platform_Sub$batch(
-		_elm_lang$core$Native_List.fromArray(
-			[
-				_elm_lang$animation_frame$AnimationFrame$diffs(_user$project$Pong_Types$TimeUpdate),
-				_elm_lang$keyboard$Keyboard$downs(_user$project$Pong_Types$KeyDown),
-				_elm_lang$keyboard$Keyboard$ups(_user$project$Pong_Types$KeyUp)
-			]));
-};
+var _user$project$Pong_Ports$alarm = _elm_lang$core$Native_Platform.outgoingPort(
+	'alarm',
+	function (v) {
+		return null;
+	});
+
 var _user$project$Pong_State$hitPlayer = F2(
 	function (player, ball) {
 		var _p0 = player.side;
@@ -8981,25 +8978,32 @@ var _user$project$Pong_State$hitPlayer = F2(
 			return (_elm_lang$core$Native_Utils.cmp(ball.y, player.y) > 0) && ((_elm_lang$core$Native_Utils.cmp(ball.y, player.y + 100) < 0) && (_elm_lang$core$Native_Utils.cmp(ball.x, player.x) > 0));
 		}
 	});
-var _user$project$Pong_State$abs = function (num) {
-	return (num * num) / num;
-};
 var _user$project$Pong_State$roofBounce = function (direction) {
 	return (_elm_lang$core$Basics$pi / 2) - direction;
 };
-var _user$project$Pong_State$bounce = F3(
-	function (ball, angle, correction) {
+var _user$project$Pong_State$howFarPastX = F2(
+	function (angle, y) {
+		var angle$ = _elm_lang$core$Basics$abs(angle);
+		var oppositeAngle = (_elm_lang$core$Basics$pi / 2) - angle$;
+		return (y * _elm_lang$core$Basics$sin(oppositeAngle)) / _elm_lang$core$Basics$sin(angle$);
+	});
+var _user$project$Pong_State$bounce = F4(
+	function (ball, angle, x, y) {
+		var angleVal = A2(_elm_lang$core$Debug$log, 'angle is: ', angle);
+		var yVal = A2(_elm_lang$core$Debug$log, 'y is: ', y);
+		var xVal = A2(_elm_lang$core$Debug$log, 'x is: ', x);
 		return _elm_lang$core$Native_Utils.update(
 			ball,
-			{direction: ball.direction + angle});
+			{direction: ball.direction + angle, x: ball.x - x, y: ball.y - y});
 	});
 var _user$project$Pong_State$wall = 1400;
 var _user$project$Pong_State$roof = 0;
 var _user$project$Pong_State$hitRoof = function (ball) {
 	if (_elm_lang$core$Native_Utils.cmp(ball.y, _user$project$Pong_State$roof) < 1) {
 		var bouncedAngle = _user$project$Pong_State$roofBounce(ball.direction);
-		var angle = ball.direction + (_elm_lang$core$Basics$pi / 4);
-		return A3(_user$project$Pong_State$bounce, ball, angle, _user$project$Pong_State$roof - ball.y);
+		var angle = 0 - (ball.direction * 2);
+		var hfpX = A2(_user$project$Pong_State$howFarPastX, ball.direction, -1 * ball.y);
+		return A4(_user$project$Pong_State$bounce, ball, angle, hfpX, ball.y);
 	} else {
 		return ball;
 	}
@@ -9008,7 +9012,7 @@ var _user$project$Pong_State$floor = 1000;
 var _user$project$Pong_State$hitFloor = function (ball) {
 	if (_elm_lang$core$Native_Utils.cmp(ball.y, _user$project$Pong_State$floor) > -1) {
 		var angle = ball.direction + (_elm_lang$core$Basics$pi / 4);
-		return A3(_user$project$Pong_State$bounce, ball, angle, _user$project$Pong_State$floor - ball.y);
+		return A4(_user$project$Pong_State$bounce, ball, angle, _user$project$Pong_State$floor - ball.y, 0.1);
 	} else {
 		return ball;
 	}
@@ -9042,7 +9046,7 @@ var _user$project$Pong_State$bouncePlayer = F2(
 	function (player, ball) {
 		var py = player.y;
 		var px = player.y;
-		return A2(_user$project$Pong_State$hitPlayer, player, ball) ? A3(_user$project$Pong_State$bounce, ball, _elm_lang$core$Basics$pi / 4, 0) : ball;
+		return A2(_user$project$Pong_State$hitPlayer, player, ball) ? A4(_user$project$Pong_State$bounce, ball, _elm_lang$core$Basics$pi / 4, 0, 0) : ball;
 	});
 var _user$project$Pong_State$ballMove = F3(
 	function (dt, speed, direction) {
@@ -9182,15 +9186,10 @@ var _user$project$Pong_State$update = F2(
 			_1: _elm_lang$core$Platform_Cmd$none
 		};
 	});
-var _user$project$Pong_State$initBall = {x: 350, y: 400, speed: 1, direction: _elm_lang$core$Basics$pi / 4};
+var _user$project$Pong_State$initBall = {x: 350, y: 400, speed: 1, direction: 0 - (_elm_lang$core$Basics$pi / 6)};
 var _user$project$Pong_State$initPlayer = F2(
 	function (startX, startSide) {
 		return {x: startX, y: 500, velocity: 0, direction: _user$project$Pong_Types$None, side: startSide};
-	});
-var _user$project$Pong_State$alarm = _elm_lang$core$Native_Platform.outgoingPort(
-	'alarm',
-	function (v) {
-		return null;
 	});
 var _user$project$Pong_State$init = {
 	ctor: '_Tuple2',
@@ -9199,18 +9198,28 @@ var _user$project$Pong_State$init = {
 		player2: A2(_user$project$Pong_State$initPlayer, 1350, _user$project$Pong_Types$Right),
 		ball: _user$project$Pong_State$initBall
 	},
-	_1: _user$project$Pong_State$alarm(
+	_1: _user$project$Pong_Ports$alarm(
 		{ctor: '_Tuple0'})
 };
 
-var _user$project$Main$main = {
+var _user$project$Pong_Subscriptions$subscriptions = function (model) {
+	return _elm_lang$core$Platform_Sub$batch(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$animation_frame$AnimationFrame$diffs(_user$project$Pong_Types$TimeUpdate),
+				_elm_lang$keyboard$Keyboard$downs(_user$project$Pong_Types$KeyDown),
+				_elm_lang$keyboard$Keyboard$ups(_user$project$Pong_Types$KeyUp)
+			]));
+};
+
+var _user$project$App$main = {
 	main: _elm_lang$html$Html_App$program(
-		{init: _user$project$Pong_State$init, update: _user$project$Pong_State$update, view: _user$project$Pong_View$view, subscriptions: _user$project$Pong_State$subscriptions})
+		{init: _user$project$Pong_State$init, update: _user$project$Pong_State$update, view: _user$project$Pong_View$view, subscriptions: _user$project$Pong_Subscriptions$subscriptions})
 };
 
 var Elm = {};
-Elm['Main'] = Elm['Main'] || {};
-_elm_lang$core$Native_Platform.addPublicModule(Elm['Main'], 'Main', typeof _user$project$Main$main === 'undefined' ? null : _user$project$Main$main);
+Elm['App'] = Elm['App'] || {};
+_elm_lang$core$Native_Platform.addPublicModule(Elm['App'], 'App', typeof _user$project$App$main === 'undefined' ? null : _user$project$App$main);
 
 if (typeof define === "function" && define['amd'])
 {

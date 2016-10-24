@@ -15,7 +15,7 @@
 <script type="text/javascript">
 var audio = document.getElementById('alarm');
   var elmDiv = document.getElementById('elm-app-lives-here');
-  var app = Elm.Main.embed(elmDiv);
+  var app = Elm.App.embed(elmDiv);
   app.ports.alarm.subscribe(function() {
     alarm.play();
  });

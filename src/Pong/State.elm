@@ -1,4 +1,4 @@
-module Pong.State exposing (init, update, floor, wall, roof, howFarPastX, roofBounce)
+port module Pong.State exposing (init, update, floor, wall, roof, howFarPastX, roofBounce)
 
 import Pong.Types exposing (..)
 import Pong.Key exposing (..)
