@@ -8978,8 +8978,8 @@ var _user$project$Pong_State$hitPlayer = F2(
 			return (_elm_lang$core$Native_Utils.cmp(ball.y, player.y) > 0) && ((_elm_lang$core$Native_Utils.cmp(ball.y, player.y + 100) < 0) && (_elm_lang$core$Native_Utils.cmp(ball.x, player.x) > 0));
 		}
 	});
-var _user$project$Pong_State$roofBounce = function (direction) {
-	return (_elm_lang$core$Basics$pi / 2) - direction;
+var _user$project$Pong_State$generalBounce = function (direction) {
+	return 0 - direction;
 };
 var _user$project$Pong_State$howFarPastX = F2(
 	function (angle, y) {
@@ -8994,31 +8994,37 @@ var _user$project$Pong_State$bounce = F4(
 		var xVal = A2(_elm_lang$core$Debug$log, 'x is: ', x);
 		return _elm_lang$core$Native_Utils.update(
 			ball,
-			{direction: ball.direction + angle, x: ball.x - x, y: ball.y - y});
+			{direction: angle, x: ball.x - x, y: ball.y - y});
 	});
 var _user$project$Pong_State$wall = 1400;
 var _user$project$Pong_State$roof = 0;
 var _user$project$Pong_State$hitRoof = function (ball) {
 	if (_elm_lang$core$Native_Utils.cmp(ball.y, _user$project$Pong_State$roof) < 1) {
-		var bouncedAngle = _user$project$Pong_State$roofBounce(ball.direction);
-		var angle = 0 - (ball.direction * 2);
+		var bouncedAngle = _user$project$Pong_State$generalBounce(ball.direction);
 		var hfpX = A2(_user$project$Pong_State$howFarPastX, ball.direction, -1 * ball.y);
-		return A4(_user$project$Pong_State$bounce, ball, angle, hfpX, ball.y);
+		return A4(_user$project$Pong_State$bounce, ball, bouncedAngle, hfpX, ball.y);
 	} else {
 		return ball;
 	}
 };
 var _user$project$Pong_State$floor = 1000;
 var _user$project$Pong_State$hitFloor = function (ball) {
-	if (_elm_lang$core$Native_Utils.cmp(ball.y, _user$project$Pong_State$floor) > -1) {
-		var angle = ball.direction + (_elm_lang$core$Basics$pi / 4);
-		return A4(_user$project$Pong_State$bounce, ball, angle, _user$project$Pong_State$floor - ball.y, 0.1);
+	if (_elm_lang$core$Native_Utils.cmp(ball.y, _user$project$Pong_State$floor) > 0) {
+		var bouncedAngle = A2(
+			_elm_lang$core$Debug$log,
+			'Bounce angle: ',
+			_user$project$Pong_State$generalBounce(ball.direction));
+		var hfpY = ball.y - _user$project$Pong_State$floor;
+		var hfpX = A2(
+			_elm_lang$core$Debug$log,
+			'hfp:',
+			A2(_user$project$Pong_State$howFarPastX, ball.direction, hfpY));
+		return A4(_user$project$Pong_State$bounce, ball, bouncedAngle, hfpX, hfpY);
 	} else {
 		return ball;
 	}
 };
 var _user$project$Pong_State$bounceEnvironment = function (ball) {
-	var roof = 0;
 	return _user$project$Pong_State$hitFloor(
 		_user$project$Pong_State$hitRoof(ball));
 };
@@ -9044,9 +9050,7 @@ var _user$project$Pong_State$applyPlayerPhysics = F2(
 	});
 var _user$project$Pong_State$bouncePlayer = F2(
 	function (player, ball) {
-		var py = player.y;
-		var px = player.y;
-		return A2(_user$project$Pong_State$hitPlayer, player, ball) ? A4(_user$project$Pong_State$bounce, ball, _elm_lang$core$Basics$pi / 4, 0, 0) : ball;
+		return A2(_user$project$Pong_State$hitPlayer, player, ball) ? A4(_user$project$Pong_State$bounce, ball, ball.direction + (2 * ball.direction), 0, 0) : ball;
 	});
 var _user$project$Pong_State$ballMove = F3(
 	function (dt, speed, direction) {
@@ -9186,7 +9190,7 @@ var _user$project$Pong_State$update = F2(
 			_1: _elm_lang$core$Platform_Cmd$none
 		};
 	});
-var _user$project$Pong_State$initBall = {x: 350, y: 400, speed: 1, direction: 0 - (_elm_lang$core$Basics$pi / 6)};
+var _user$project$Pong_State$initBall = {x: 350, y: 400, speed: 1, direction: _elm_lang$core$Basics$pi / 4};
 var _user$project$Pong_State$initPlayer = F2(
 	function (startX, startSide) {
 		return {x: startX, y: 500, velocity: 0, direction: _user$project$Pong_Types$None, side: startSide};
