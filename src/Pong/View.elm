@@ -71,13 +71,13 @@ dotNet yPos =
 getRect : Float -> Float -> Svg Msg
 getRect xPos yPos =
     let
-        xPos' =
+        xPos_ =
             toString xPos
 
-        yPos' =
+        yPos_ =
             toString yPos
     in
-        rect [ x xPos', y yPos', Svg.Attributes.width "15", Svg.Attributes.height "100", fill "white" ] []
+        rect [ x xPos_, y yPos_, Svg.Attributes.width "15", Svg.Attributes.height "100", fill "white" ] []
 
 
 getBall : Float -> Float -> Svg Msg

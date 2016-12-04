@@ -217,13 +217,13 @@ hitFloor ball =
 howFarPastX : Float -> Float -> Float
 howFarPastX angle y =
     let
-        angle' =
+        angle_ =
             (abs angle)
 
         oppositeAngle =
-            (pi / 2) - angle'
+            (pi / 2) - angle_
     in
-        y * (sin oppositeAngle) / (sin angle')
+        y * (sin oppositeAngle) / (sin angle_)
 
 
 generalBounce : Float -> Float
